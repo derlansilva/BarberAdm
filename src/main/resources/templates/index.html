@@ -8,13 +8,68 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
-        /* Variáveis de Largura */
-        :root {
-            --sidebar-width-open: 250px;
-            --sidebar-width-closed: 60px;
-            --header-height: 60px;
+
+
+        /* Variáveis de Largura (Já existem no seu código) */
+:root {
+    --sidebar-width-open: 250px;
+    --sidebar-width-closed: 60px;
+     --header-height: 60px;
             --content-padding: 20px;
-        }
+    /* ... */
+}
+
+/* 4. CONTEÚDO PRINCIPAL (Ajuste o padding-left para a largura fechada) */
+.main-content {
+    /* ... outros estilos ... */
+    /* Padding inicial: largura da sidebar fechada + padding normal */
+    padding-left: calc(var(--sidebar-width-closed) + var(--content-padding));
+    transition: padding-left 0.3s ease; /* Adiciona transição suave */
+}
+
+/* 5. AÇÃO: Estado ABERTO (Aumenta o padding-left) */
+body.sidebar-open .main-content {
+    padding-left: calc(var(--sidebar-width-open) + var(--content-padding));
+}
+
+/* CORREÇÃO VISUAL PARA O HEADER (Garantir que ele estique) */
+#main-header {
+    /* ... outros estilos ... */
+    left: var(--sidebar-width-closed); /* Posição inicial (fechado) */
+    width: calc(100% - var(--sidebar-width-closed)); /* Largura inicial */
+    transition: left 0.3s ease, width 0.3s ease; /* Essencial para a animação */
+}
+
+/* 5.1. AÇÃO: Estado ABERTO (Empurra o header e encolhe sua largura) */
+body.sidebar-open #main-header {
+    left: var(--sidebar-width-open); /* Empurra para a direita */
+    width: calc(100% - var(--sidebar-width-open)); /* Encolhe a largura */
+}
+
+/* 3. BOTÃO DE CONTROLE (NOVA POSIÇÃO FIXA) */
+#menu-toggle {
+    /* Define o botão na posição fixa */
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1005; /* Acima de tudo (sidebar z-index é 1002, header é 999) */
+
+    /* Centraliza o botão verticalmente dentro da altura do header */
+    height: var(--header-height);
+    width: var(--sidebar-width-closed); /* Largura padrão da sidebar fechada (60px) */
+
+    /* Estilização para centralizar o ícone */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Remove bordas e fundo para se integrar melhor, use a cor da sidebar */
+    background-color: #343a40;
+    color: white;
+    border: none;
+    padding: 0; /* Remove padding extra */
+}
+
 
         /* CORREÇÕES GERAIS */
         html, body { overflow-x: hidden; }
@@ -93,10 +148,12 @@
     </div>
 </header>
 
+<button class="btn btn-dark" id="menu-toggle" title="Abrir/Fechar Menu">
+    <i class="bi bi-list"></i>
+</button>
+
 <div id="sidebar-wrapper">
-    <button class="btn btn-dark" id="menu-toggle" title="Abrir/Fechar Menu">
-        <i class="bi bi-list"></i>
-    </button>
+
     <ul class="nav flex-column">
         <li class="nav-item">
             <a class="sidebar-link active-menu" data-target="dashboard-section"><i class="bi bi-speedometer2"></i> <span class="sidebar-text">Dashboard</span></a>
@@ -153,8 +210,124 @@
         </div>
     </div>
 
-    <div id="agendamentos-section" class="content-section"></div>
+    <div id="agendamentos-section" class="content-section">
+        <div class="card mb-4 p-3 shadow-sm">
+            <h5 class="mb-3"><i class="bi bi-funnel-fill"></i> Filtrar Agendamentos</h5>
+            <div class="row align-items-center">
+
+                <div class="col-md-3 mb-3 mb-md-0">
+                    <label for="filtroData" class="form-label">Data</label>
+                    <input type="date" class="form-control" id="filtroData" value="2025-12-02">
+                </div>
+
+                <div class="col-md-3 mb-3 mb-md-0">
+                    <label for="filtroStatus" class="form-label">Status</label>
+                    <select class="form-select" id="filtroStatus">
+                        <option selected value="">Todos os Status</option>
+                        <option value="confirmado">Confirmado</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="concluido">Concluído</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <label for="filtroCliente" class="form-label">Cliente (Nome/WhatsApp)</label>
+                    <input type="text" class="form-control" id="filtroCliente" placeholder="Buscar cliente...">
+                </div>
+
+                <div class="col-md-2 mt-auto">
+                    <button class="btn btn-primary w-100">Aplicar Filtro</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-lg">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Resultados da Busca (Total: 12 Agendamentos)</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Hora</th>
+                            <th>Cliente</th>
+                            <th>Serviço</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="table-success">
+                            <td>123</td>
+                            <td>09:00</td>
+                            <td><span class="cliente-link" data-bs-toggle="modal" data-bs-target="#modalClienteDetalhes">Ana Paula</span></td>
+                            <td>Platinado</td>
+                            <td>R$ 150,00</td>
+                            <td><span class="badge bg-secondary">CONCLUÍDO</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info" title="Ver Detalhes"><i class="bi bi-eye"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>124</td>
+                            <td>10:00</td>
+                            <td><span class="cliente-link" data-bs-toggle="modal" data-bs-target="#modalClienteDetalhes">Lucas Oliveira</span></td>
+                            <td>Corte + Barba</td>
+                            <td>R$ 75,00</td>
+                            <td><span class="badge bg-success">CONFIRMADO</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" title="Marcar como Concluído"><i class="bi bi-check-lg"></i></button>
+                                <button class="btn btn-sm btn-danger" title="Cancelar"><i class="bi bi-x-lg"></i></button>
+                            </td>
+                        </tr>
+                        <tr class="table-warning">
+                            <td>125</td>
+                            <td>14:00</td>
+                            <td><span class="cliente-link" data-bs-toggle="modal" data-bs-target="#modalClienteDetalhes">Pedro Augusto</span></td>
+                            <td>Barba Tradicional</td>
+                            <td>R$ 35,00</td>
+                            <td><span class="badge bg-warning text-dark">PENDENTE</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-success" title="Reenviar Confirmação Zap"><i class="bi bi-arrow-repeat"></i></button>
+                                <button class="btn btn-sm btn-danger" title="Cancelar"><i class="bi bi-x-lg"></i></button>
+                            </td>
+                        </tr>
+                        <tr class="table-danger">
+                            <td>126</td>
+                            <td>16:00</td>
+                            <td><span class="cliente-link" data-bs-toggle="modal" data-bs-target="#modalClienteDetalhes">Mariana Silva</span></td>
+                            <td>Platinado</td>
+                            <td>R$ 100,00</td>
+                            <td><span class="badge bg-danger">CANCELADO</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-secondary" title="Reagendar"><i class="bi bi-calendar-plus"></i></button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer text-muted d-flex justify-content-between">
+                <span>Mostrando 1 a 4 de 12 agendamentos.</span>
+                <nav aria-label="Paginação">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Próxima</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
     <div id="servicos-section" class="content-section"></div>
+
     <div id="fidelidade-section" class="content-section"></div>
 
 
@@ -209,7 +382,7 @@
                 <form id="agendamentoFormAdmin">
                     <div class="mb-3" style="position: relative;">
                         <label for="nomeClienteAdmin" class="form-label">Nome do Cliente</label>
-                        <input type="text" class="form-control" id="nomeClienteAdmin" name="nome" placeholder="Digite o nome ou comece a digitar" required>
+                        <input type="text" class="form-control" id="nomeClienteAdmin" name="nome" placeholder="Digite o nome ou comece a digitar" autocomplete="off" required>
 
                         <div id="autocompleteResults" class="list-group position-absolute w-100 shadow" style="z-index: 2000; display: none;"></div>
                     </div>
@@ -247,224 +420,373 @@
 </div>
 
 <div class="modal fade" id="modalClienteDetalhes" tabindex="-1" aria-labelledby="modalClienteDetalhesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg"> <div class="modal-content">
+
+        <div class="modal-header bg-info text-white">
+            <h5 class="modal-title" id="modalClienteDetalhesLabel">
+                <i class="bi bi-person-circle"></i> Detalhes do Cliente: <span id="clienteNomeDetalhe">Lucas Oliveira</span>
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h6><i class="bi bi-telephone-fill text-primary"></i> Contato Principal</h6>
+                    <p class="mb-1">
+                        <strong>WhatsApp:</strong> <span id="clienteWhatsappDetalhe">(41) 99876-1234</span>
+                        <a href="#" class="btn btn-sm btn-outline-success ms-2" title="Enviar Mensagem"><i class="bi bi-whatsapp"></i></a>
+                    </p>
+                    <p>
+                        <strong>E-mail:</strong> <span id="clienteEmailDetalhe">lucas.o@exemplo.com</span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h6><i class="bi bi-calendar-event text-primary"></i> Última Interação</h6>
+                    <p class="mb-1">
+                        <strong>Último Corte:</strong> <span id="dataUltimoCorte">25/Nov/2025</span>
+                    </p>
+                    <p>
+                        <strong>Próximo Agendado:</strong> <span id="dataProximoAgendamento" class="text-success">15/Dez/2025 (10:00)</span>
+                    </p>
+                </div>
+            </div>
+
+            <hr>
+
+            <h5 class="mb-3"><i class="bi bi-star-fill text-warning"></i> Status de Fidelidade (10 Cortes = 1 Grátis)</h5>
+
+            <div class="card bg-light p-4 shadow-sm">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <p class="mb-1 text-primary">Cortes Acumulados:</p>
+                        <h2 class="text-huge mb-3">
+                            <span id="cortesAtuais">8</span> de 10
+                        </h2>
+                        <div class="progress" role="progressbar" aria-label="Progresso Fidelidade" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="height: 15px;">
+                            <div id="progressoBarra" class="progress-bar bg-warning" style="width: 80%;"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center mt-3 mt-md-0">
+                        <h5 class="text-secondary">Faltam:</h5>
+                        <h1 class="display-4 text-danger" id="cortesFaltantes">2</h1>
+                        <p class="text-muted">cortes para o grátis!</p>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="mt-4">
+
+            <h5 class="mb-3"><i class="bi bi-clock-history text-secondary"></i> Histórico Recente (Últimos 5)</h5>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-sm">
+                    <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Serviço</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody id="historicoTabelaCorpo">
+                    <tr class="table-info">
+                        <td>25/Nov/2025</td>
+                        <td>Corte de Cabelo</td>
+                        <td>R$ 40,00</td>
+                        <td><span class="badge bg-success">Concluído</span></td>
+                    </tr>
+                    <tr>
+                        <td>10/Nov/2025</td>
+                        <td>Barba Tradicional</td>
+                        <td>R$ 35,00</td>
+                        <td><span class="badge bg-success">Concluído</span></td>
+                    </tr>
+                    <tr>
+                        <td>28/Out/2025</td>
+                        <td>Combo (Corte + Barba)</td>
+                        <td>R$ 75,00</td>
+                        <td><span class="badge bg-success">Concluído</span></td>
+                    </tr>
+                    <tr class="table-warning">
+                        <td>15/Out/2025</td>
+                        <td>Corte Grátis</td>
+                        <td>R$ 0,00</td>
+                        <td><span class="badge bg-warning text-dark">RESGATE</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+        </div>
+    </div>
+    </div>
+</div>
 </div>
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+
     document.addEventListener('DOMContentLoaded', function () {
 
-        // =================================================================
-        // 1. INICIALIZAÇÃO DE VARIÁVEIS E COMPONENTES
-        // =================================================================
-        const body = document.body;
-        const menuToggle = document.getElementById('menu-toggle');
-        const mainHeader = document.getElementById('main-header');
-        const sidebarWidthClosed = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width-closed').trim();
-        const sidebarLinks = document.querySelectorAll('.sidebar-link[data-target]');
-        const contentSections = document.querySelectorAll('.content-section');
-        const mainPageTitle = document.getElementById('main-page-title');
+    // =================================================================
+    // 1. INICIALIZAÇÃO DE VARIÁVEIS E COMPONENTES
+    // =================================================================
+    const body = document.body;
+    const menuToggle = document.getElementById('menu-toggle');
+    const mainHeader = document.getElementById('main-header');
 
-        // Modal de Cadastro (SPINNER)
-        const modalElementCadastro = document.getElementById('modalCadastroCliente');
-        const cadastroForm = document.getElementById('cadastroFormModal');
-        const spinnerCadastro = document.getElementById('loadingSpinnerCadastro');
-        const resultMessageDiv = document.getElementById('resultMessageCadastro');
-        const messageTitle = document.getElementById('messageTitle');
-        const messageBody = document.getElementById('messageBody');
-        const modalCadastro = modalElementCadastro ? new bootstrap.Modal(modalElementCadastro) : null;
+    // Variáveis de Layout e Sidebar
+    const sidebarWidthClosed = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width-closed').trim();
+    const sidebarLinks = document.querySelectorAll('.sidebar-link[data-target]');
+    const contentSections = document.querySelectorAll('.content-section');
+    const mainPageTitle = document.getElementById('main-page-title');
 
-        // Modal de Agendamento (AUTOCOMPLETAR)
-        const inputNomeCliente = document.getElementById('nomeClienteAdmin');
-        const divResultados = document.getElementById('autocompleteResults');
-        let searchTimeout;
+    // Modal de Cadastro (SPINNER)
+    const modalElementCadastro = document.getElementById('modalCadastroCliente');
+    const cadastroForm = document.getElementById('cadastroFormModal');
+    const spinnerCadastro = document.getElementById('loadingSpinnerCadastro');
+    const resultMessageDiv = document.getElementById('resultMessageCadastro');
+    const messageTitle = document.getElementById('messageTitle');
+    const messageBody = document.getElementById('messageBody');
+    const modalCadastro = modalElementCadastro ? new bootstrap.Modal(modalElementCadastro) : null;
 
-        // Configurações de Tempo
-        const TEMPO_ESPERA_SPINNER = 3000;
-        const TEMPO_EXIBICAO_MENSAGEM = 2000;
+    // Modal de Agendamento (AUTOCOMPLETAR)
+    const inputNomeCliente = document.getElementById('nomeClienteAdmin');
+    const divResultados = document.getElementById('autocompleteResults');
+    let searchTimeout;
 
-        // Setup Autocompletar: Anexar resultados
-        if (inputNomeCliente && divResultados && !divResultados.parentNode) {
-            const parentDiv = inputNomeCliente.closest('.mb-3');
-            if (parentDiv) {
-                parentDiv.appendChild(divResultados);
-            }
+    // Configurações de Tempo
+    const TEMPO_ESPERA_SPINNER = 3000;
+    const TEMPO_EXIBICAO_MENSAGEM = 2000;
+
+    // Setup Autocompletar: Anexar divResults (Garantia de que o elemento existe no DOM)
+    if (inputNomeCliente && divResultados && !divResultados.parentNode) {
+        const parentDiv = inputNomeCliente.closest('.mb-3');
+        if (parentDiv) {
+            parentDiv.appendChild(divResultados);
         }
+    }
 
-        // --- FUNÇÕES DE NAVEGAÇÃO ---
-        function navigateToSection(targetId, title) {
-            contentSections.forEach(section => { section.style.display = 'none'; });
-            const targetSection = document.getElementById(targetId);
-            if (targetSection) { targetSection.style.display = 'block'; }
-            mainPageTitle.textContent = title;
-            sidebarLinks.forEach(link => {
-                link.classList.remove('active-menu');
-                if (link.getAttribute('data-target') === targetId) { link.classList.add('active-menu'); }
-            });
-        }
-        function toggleSidebar() { /* Lógica de toggle sidebar */ }
+    // --- FUNÇÕES DE NAVEGAÇÃO ---
+    function navigateToSection(targetId, title) {
+        contentSections.forEach(section => { section.style.display = 'none'; });
+        const targetSection = document.getElementById(targetId);
+        if (targetSection) { targetSection.style.display = 'block'; }
+        mainPageTitle.textContent = title;
+        sidebarLinks.forEach(link => {
+            link.classList.remove('active-menu');
+            if (link.getAttribute('data-target') === targetId) { link.classList.add('active-menu'); }
+        });
+    }
 
+    // =================================================================
+    // 2. LÓGICA DO FORMULÁRIO DE CADASTRO (Spinner/Submit)
+    // =================================================================
 
-        // =================================================================
-        // 2. LÓGICA DO FORMULÁRIO DE CADASTRO (Spinner/Submit)
-        // =================================================================
+    if (cadastroForm && modalElementCadastro) {
+        cadastroForm.addEventListener('submit', function(event) {
+            event.preventDefault();
 
-        if (cadastroForm && modalElementCadastro) {
-            cadastroForm.addEventListener('submit', function(event) {
-                event.preventDefault();
+            const formData = new FormData(event.target);
+            const params = new URLSearchParams(formData).toString();
 
-                const formData = new FormData(event.target);
-                const params = new URLSearchParams(formData).toString();
+            // Transição: Esconde Inputs, Mostra Spinner, Bloqueia Botão
+            cadastroForm.style.display = 'none';
+            spinnerCadastro.style.display = 'flex';
+            const submitButton = cadastroForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            const startTime = Date.now();
 
-                cadastroForm.style.display = 'none';
-                spinnerCadastro.style.display = 'flex';
-                const submitButton = cadastroForm.querySelector('button[type="submit"]');
-                submitButton.disabled = true;
-                const startTime = Date.now();
+            fetch('/cadastrar', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params })
+            .then(response => { return Promise.all([response.ok, response.text()]); })
+            .then(([isSuccess, message]) => {
 
-                fetch('/cadastrar', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params })
-                .then(response => { return Promise.all([response.ok, response.text()]); })
-                .then(([isSuccess, message]) => {
+                const remainingDelay = Math.max(0, TEMPO_ESPERA_SPINNER - (Date.now() - startTime));
 
-                    const remainingDelay = Math.max(0, TEMPO_ESPERA_SPINNER - (Date.now() - startTime));
+                setTimeout(() => {
+                    // Transição: Esconde Spinner, Mostra Mensagem
+                    spinnerCadastro.style.display = 'none';
+
+                    if (isSuccess) {
+                        messageTitle.textContent = "✅ Cliente Cadastrado!";
+                        messageTitle.className = 'text-success text-center';
+                    }
+                    else {
+                        messageTitle.textContent = "❌ Falha no Cadastro!";
+                        messageTitle.className = 'text-danger text-center';
+                    }
+                    messageBody.textContent = message;
+                    resultMessageDiv.style.display = 'flex';
 
                     setTimeout(() => {
-                        spinnerCadastro.style.display = 'none';
+                        modalCadastro.hide();
+                        window.location.href = '/admin';
+                    }, TEMPO_EXIBICAO_MENSAGEM);
 
-                        if (isSuccess) { messageTitle.textContent = "✅ Cliente Cadastrado!"; messageTitle.className = 'text-success text-center'; }
-                        else { messageTitle.textContent = "❌ Falha no Cadastro!"; messageTitle.className = 'text-danger text-center'; }
-                        messageBody.textContent = message;
-                        resultMessageDiv.style.display = 'flex';
+                }, remainingDelay);
+            })
+            .catch(error => {
+                console.error("Erro na Requisição:", error);
+                alert("Ocorreu um erro de conexão. Tente novamente.");
 
-                        setTimeout(() => {
-                            modalCadastro.hide();
-                            window.location.href = '/admin';
-                        }, TEMPO_EXIBICAO_MENSAGEM);
-
-                    }, remainingDelay);
-                })
-                .catch(error => {
-                    console.error("Erro na Requisição:", error);
-                    alert("Ocorreu um erro de conexão. Tente novamente.");
-                    spinnerCadastro.style.display = 'none';
-                    cadastroForm.style.display = 'block';
-                    submitButton.disabled = false;
-                });
-            });
-
-            // TRATAMENTO DOS EVENTOS DO MODAL DE CADASTRO (CORRIGE O MODAL EM BRANCO)
-            modalElementCadastro.addEventListener('show.bs.modal', function () {
-                cadastroForm.reset();
+                // Restaura o formulário
                 spinnerCadastro.style.display = 'none';
-                resultMessageDiv.style.display = 'none';
                 cadastroForm.style.display = 'block';
                 cadastroForm.querySelector('button[type="submit"]').disabled = false;
-            });
-            modalElementCadastro.addEventListener('hidden.bs.modal', function () {
-                cadastroForm.reset();
-                spinnerCadastro.style.display = 'none';
-                resultMessageDiv.style.display = 'none';
-                cadastroForm.style.display = 'block';
-                cadastroForm.querySelector('button[type="submit"]').disabled = false;
-            });
-        }
-
-
-        // =================================================================
-        // 3. LÓGICA DE AUTOCOMPLETAR
-        // =================================================================
-
-        if (inputNomeCliente && divResultados) {
-            inputNomeCliente.addEventListener('input', function() {
-                 clearTimeout(searchTimeout);
-                 const termo = this.value.trim();
-
-                 if (termo.length < 2) { divResultados.style.display = 'none'; return; }
-
-                 searchTimeout = setTimeout(() => {
-                     fetch(`/api/clientes/buscar?termo=${encodeURIComponent(termo)}`)
-                         .then(response => {
-                             if (!response.ok) { throw new Error('Falha na API: ' + response.status); }
-                             return response.json();
-                         })
-                         .then(clientes => {
-                             divResultados.innerHTML = '';
-                             if (Array.isArray(clientes) && clientes.length > 0) {
-                                 clientes.forEach(cliente => {
-                                     const item = document.createElement('a');
-                                     item.href = '#';
-                                     item.className = 'list-group-item list-group-item-action';
-                                     item.textContent = `${cliente.nome} (${cliente.whatsapp})`;
-                                     item.addEventListener('click', function(e) {
-                                         e.preventDefault();
-                                         inputNomeCliente.value = cliente.nome;
-                                         divResultados.style.display = 'none';
-                                     });
-                                     divResultados.appendChild(item);
-                                 });
-                                 divResultados.style.display = 'block';
-                             } else { divResultados.style.display = 'none'; }
-                         })
-                         .catch(error => {
-                             console.error('Erro na busca de clientes:', error);
-                             divResultados.style.display = 'none';
-                         });
-                 }, 300);
-             });
-
-            document.addEventListener('click', function(e) {
-                if (e.target !== inputNomeCliente && e.target.parentNode !== divResultados) {
-                    divResultados.style.display = 'none';
-                }
-            });
-        }
-
-
-        // =================================================================
-        // 4. INICIALIZAÇÃO E LISTENERS GERAIS
-        // =================================================================
-
-        // Define a função toggleSidebar aqui (já que ela é pequena):
-        const sidebarWidthOpen = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width-open').trim();
-        const toggleSidebarFunction = () => {
-             const isClosed = !body.classList.contains('sidebar-open');
-             if (isClosed) {
-                 body.classList.add('sidebar-open');
-                 menuToggle.innerHTML = '<i class="bi bi-x-lg"></i>';
-                 mainHeader.style.left = sidebarWidthOpen;
-                 mainHeader.style.width = `calc(100% - ${sidebarWidthOpen})`;
-             } else {
-                 body.classList.remove('sidebar-open');
-                 menuToggle.innerHTML = '<i class="bi bi-list"></i>';
-                 mainHeader.style.left = sidebarWidthClosed;
-                 mainHeader.style.width = `calc(100% - ${sidebarWidthClosed})`;
-             }
-         };
-
-        menuToggle.addEventListener('click', toggleSidebarFunction);
-
-        sidebarLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                const targetId = this.getAttribute('data-target');
-                if (targetId) {
-                    e.preventDefault();
-                    let title = "Dashboard de Gerenciamento";
-                    if (targetId === 'agendamentos-section') { title = "Lista Completa de Agendamentos"; }
-                    else if (targetId === 'servicos-section') { title = "Catálogo de Serviços e Preços"; }
-                    else if (targetId === 'fidelidade-section') { title = "Clientes e Controle de Fidelidade"; }
-                    navigateToSection(targetId, title);
-                }
             });
         });
 
-        // ESTADO INICIAL
-        body.classList.remove('sidebar-open');
-        menuToggle.innerHTML = '<i class="bi bi-list"></i>';
-        navigateToSection('dashboard-section', 'Dashboard de Gerenciamento');
-        mainHeader.style.left = sidebarWidthClosed;
-        // mainHeader.style.width = `calc(100% - ${sidebarWidthClosed})`; // Esta linha pode causar falhas visuais.
+        // TRATAMENTO DOS EVENTOS DO MODAL DE CADASTRO (CORRIGE TELA BRANCA)
+        modalElementCadastro.addEventListener('show.bs.modal', function () {
+            cadastroForm.reset();
+            spinnerCadastro.style.display = 'none';
+            resultMessageDiv.style.display = 'none';
+            cadastroForm.style.display = 'block'; // ESSENCIAL: Garante que os inputs são visíveis
+            cadastroForm.querySelector('button[type="submit"]').disabled = false;
+        });
+        modalElementCadastro.addEventListener('hidden.bs.modal', function () {
+            cadastroForm.reset();
+            spinnerCadastro.style.display = 'none';
+            resultMessageDiv.style.display = 'none';
+            cadastroForm.style.display = 'block';
+            cadastroForm.querySelector('button[type="submit"]').disabled = false;
+        });
+    }
 
+
+    // =================================================================
+    // 3. LÓGICA DE AUTOCOMPLETAR (Busca por nome parcial)
+    // =================================================================
+
+    if (inputNomeCliente && divResultados) {
+        inputNomeCliente.addEventListener('input', function() {
+        // CONSOLE LOG CRÍTICO: Verifique se isso aparece sempre
+        console.log("Input Evento Ativado. Caracteres:", this.value.length);
+
+            clearTimeout(searchTimeout);
+            const termo = this.value.trim();
+
+            if (termo.length < 2) { divResultados.style.display = 'none'; return; }
+
+            // Se este log aparecer, o JavaScript ESTÁ OUVINDO e o Fetch deve ser enviado
+        console.log("Termo de busca enviado para FETCH:", termo);
+                searchTimeout = setTimeout(() => {
+                fetch(`/api/find?termo=${encodeURIComponent(termo)}`)
+                    .then(response => {
+                        if (!response.ok) { throw new Error('Falha na API: ' + response.status); }
+                        return response.json();
+                    })
+                    .then(clientes => {
+                        divResultados.innerHTML = '';
+                        if (Array.isArray(clientes) && clientes.length > 0) {
+                            clientes.forEach(cliente => {
+                                const item = document.createElement('a');
+                                item.href = '#';
+                                item.className = 'list-group-item list-group-item-action';
+                                item.textContent = `${cliente.nome} (${cliente.whatsapp})`;
+                                item.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    inputNomeCliente.value = cliente.nome;
+                                    divResultados.style.display = 'none';
+                                });
+                                divResultados.appendChild(item);
+                            });
+                            divResultados.style.display = 'block';
+                        } else { divResultados.style.display = 'none'; }
+                    })
+                    .catch(error => {
+                        console.error('Erro na busca de clientes:', error);
+                        divResultados.style.display = 'none';
+                    });
+            }, 300);
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target !== inputNomeCliente && e.target.parentNode !== divResultados) {
+                divResultados.style.display = 'none';
+            }
+        });
+    }
+
+function toggleSidebar() {
+            const sidebarWidthOpen = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width-open').trim();
+            const sidebarWidthClosed = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width-closed').trim();
+
+            const isClosed = !body.classList.contains('sidebar-open');
+
+            if (isClosed) {
+                // Estado: ABRIR
+                body.classList.add('sidebar-open'); // <<< ISSO ATIVA O CSS ACIMA
+                menuToggle.innerHTML = '<i class="bi bi-x-lg"></i>';
+
+                // Estas linhas garantem que o header se move no JS, complementando o CSS
+                mainHeader.style.left = sidebarWidthOpen;
+                mainHeader.style.width = `calc(100% - ${sidebarWidthOpen})`;
+            } else {
+                // Estado: FECHAR
+                body.classList.remove('sidebar-open'); // <<< ISSO DESATIVA O CSS ACIMA
+                menuToggle.innerHTML = '<i class="bi bi-list"></i>';
+
+                // Estas linhas garantem que o header se move no JS, complementando o CSS
+                mainHeader.style.left = sidebarWidthClosed;
+                mainHeader.style.width = `calc(100% - ${sidebarWidthClosed})`;
+            }
+        }
+
+    // =================================================================
+    // 4. INICIALIZAÇÃO GERAL (Sidebar/Navegação)
+    // =================================================================
+
+    // Função de toggle (movida para o escopo correto)
+    const sidebarWidthOpen = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width-open').trim();
+    const toggleSidebarFunction = () => {
+         const isClosed = !body.classList.contains('sidebar-open');
+         if (isClosed) {
+             body.classList.add('sidebar-open');
+             menuToggle.innerHTML = '<i class="bi bi-x-lg"></i>';
+             mainHeader.style.left = sidebarWidthOpen;
+             mainHeader.style.width = `calc(100% - ${sidebarWidthOpen})`;
+         } else {
+             body.classList.remove('sidebar-open');
+             menuToggle.innerHTML = '<i class="bi bi-list"></i>';
+             mainHeader.style.left = sidebarWidthClosed;
+             mainHeader.style.width = `calc(100% - ${sidebarWidthClosed})`;
+         }
+     };
+
+    menuToggle.addEventListener('click', toggleSidebarFunction);
+
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            const targetId = this.getAttribute('data-target');
+            if (targetId) {
+                e.preventDefault();
+                let title = "Dashboard de Gerenciamento";
+                if (targetId === 'agendamentos-section') { title = "Lista Completa de Agendamentos"; }
+                else if (targetId === 'servicos-section') { title = "Catálogo de Serviços e Preços"; }
+                else if (targetId === 'fidelidade-section') { title = "Clientes e Controle de Fidelidade"; }
+                navigateToSection(targetId, title);
+            }
+        });
     });
+
+    // ESTADO INICIAL
+    body.classList.remove('sidebar-open');
+    menuToggle.innerHTML = '<i class="bi bi-list"></i>';
+    navigateToSection('dashboard-section', 'Dashboard de Gerenciamento');
+    mainHeader.style.left = sidebarWidthClosed;
+    mainHeader.style.width = `calc(100% - ${sidebarWidthClosed})`; // Garante a largura inicial correta
+
+});
+
+
 </script>
 </body>
 </html>

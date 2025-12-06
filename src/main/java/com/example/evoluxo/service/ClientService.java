@@ -31,7 +31,7 @@ public class ClientService {
     }
 
     public List<Cliente> findAllClientesByName(String name){
-        if(name == null || name.length() > 2){
+        if(name == null ){
             return Collections.emptyList();
         }
 

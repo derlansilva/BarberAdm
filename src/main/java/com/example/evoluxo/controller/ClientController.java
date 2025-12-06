@@ -44,6 +44,13 @@ public class ClientController {
 
     @GetMapping("/api/find")
     public List<Cliente> findAllClientes(@RequestParam("termo") String name){
+
+        System.out.println("verificando se esta batendo no back");
+        List<Cliente> cliente = clientService.findAllClientesByName(name);
+
+        for(Cliente c : cliente){
+            System.out.println(c.getNome());
+        }
         return clientService.findAllClientesByName(name);
     }
 }

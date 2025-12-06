@@ -42,7 +42,7 @@ public class ClienteRepository {
     public List<Cliente> findAllClientesByName(String name){
 
         String nameWithWildcard = "%"+name+"%";
-        String sql = "SELECT * FROM CLIENTE WHERE nome LIKE ?";
+        String sql = "SELECT * FROM CLIENTE WHERE nome LIKE ?   LIMIT 10";
 
         return jdbcTemplate.query(sql , (rs, rowNum) ->
                     new Cliente(
