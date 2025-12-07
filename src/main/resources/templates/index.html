@@ -132,6 +132,26 @@ body.sidebar-open #main-header {
         .text-huge { font-size: 2.5rem; font-weight: 700; }
         .cliente-link { cursor: pointer; text-decoration: underline; }
 
+
+
+       /* Estilo para tornar a linha TR inteira clicável */
+.cliente-row {
+    cursor: pointer; /* Muda o cursor para indicar que a linha é interativa */
+}
+
+/* Efeito sutil ao passar o mouse sobre a linha */
+.cliente-row:hover {
+    background-color: #f0f8ff; /* Cor de fundo suave (azul claro) */
+    transition: background-color 0.2s ease;
+}
+
+/* Mantendo o estilo do nome, mas agora sem a cor azul inicial */
+.cliente-link {
+    color: inherit;     /* Usa a cor do texto da célula (preto/cinza) */
+    text-decoration: none; /* Remove o sublinhado */
+    font-weight: 500;
+}
+
     </style>
 </head>
 <body>
@@ -448,7 +468,80 @@ body.sidebar-open #main-header {
         </div>
     </div>
 
-    <div id="fidelidade-section" class="content-section"></div>
+
+    <div id="fidelidade-section" class="content-section">
+        <h2 class="mb-4">Clientes e Controle de Fidelidade</h2>
+
+        <div class="card bg-info text-white shadow mb-4">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-gem"></i> Regras de Pontuação</h5>
+                <p class="mb-0">Cada 10 cortes ou serviços completos dão direito a 1 **Corte de Cabelo Grátis**.</p>
+                <small class="fw-bold">Fidelidade é essencial! Incentive o cliente a chegar aos 10 pontos.</small>
+            </div>
+        </div>
+
+        <div class="card shadow-lg mb-5">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="bi bi-people-fill"></i> Clientes Próximos (8, 9 ou 10 Cortes)</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Nome do Cliente</th>
+                            <th>WhatsApp</th>
+                            <th>Progresso</th>
+                            <th>Falta</th>
+                            <th>Ações Rápidas</th>
+                        </tr>
+                        </thead>
+                        <tbody id="listaClientesFidelidade">
+                        <tr class="cliente-row"
+                            data-cliente-id="101"
+                            data-nome="Maria Luiza"
+                            data-whatsapp="(41) 98888-7777"
+                            data-cortes="9"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalClienteDetalhes"
+                        >
+                            <td><span class="cliente-link text-primary" data-bs-toggle="modal" data-bs-target="#modalClienteDetalhes">Maria Luiza</span></td>
+                            <td>(41) 98888-7777</td>
+                            <td>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar bg-warning" style="width: 90%;"></div>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-warning text-dark">Falta 1 Corte</span></td>
+                            <td><button class="btn btn-sm btn-success btn-add-ponto" title="Adicionar Ponto"><i class="bi bi-check-lg"></i> Ponto</button></td>
+                        </tr>
+
+
+                        <tr
+                                class="cliente-row"
+                                data-cliente-id="102"
+                                data-nome="Ronaldo Silva"
+                                data-whatsapp="(41) 97777-6666"
+                                data-cortes="8"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalClienteDetalhes"
+                        >
+                            <td><span class="cliente-link text-primary" data-bs-toggle="modal" data-bs-target="#modalClienteDetalhes">Ronaldo Silva</span></td>
+                            <td>(41) 97777-6666</td>
+                            <td>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar bg-info" style="width: 80%;"></div>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-info">Faltam 2 Cortes</span></td>
+                            <td><button class="btn btn-sm btn-success btn-add-ponto" title="Adicionar Ponto"><i class="bi bi-check-lg"></i> Ponto</button></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 </main>
@@ -582,7 +675,7 @@ body.sidebar-open #main-header {
                     <div class="col-md-8">
                         <p class="mb-1 text-primary">Cortes Acumulados:</p>
                         <h2 class="text-huge mb-3">
-                            <span id="cortesAtuais">8</span> de 10
+                            <span id="cortesAtuais">8</span>
                         </h2>
                         <div class="progress" role="progressbar" aria-label="Progresso Fidelidade" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="height: 15px;">
                             <div id="progressoBarra" class="progress-bar bg-warning" style="width: 80%;"></div>

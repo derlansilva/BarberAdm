@@ -275,6 +275,43 @@ class AdminDashboard {
         });
     }
 
+setupModalDetalhesLoader() {
+    const modalDetalhesElement = document.getElementById('modalClienteDetalhes');
+
+    if (modalDetalhesElement) {
+        modalDetalhesElement.addEventListener('show.bs.modal', (event) => {
+
+            // Descobre qual TR disparou o modal
+            const relatedTarget = event.relatedTarget;
+
+            // Verifica se o alvo é a linha do cliente (tr)
+            if (relatedTarget && relatedTarget.classList.contains('cliente-row')) {
+                const row = relatedTarget;
+                const clienteId = row.dataset.clienteId;
+                const nome = row.dataset.nome;
+                const whatsapp = row.dataset.whatsapp;
+                const cortes = parseInt(row.dataset.cortes);
+
+                // Em Produção: FETCH para carregar o histórico completo (GET /api/clientes/{clienteId})
+
+                // Atualizar o Título e Dados do Modal
+                document.getElementById('modalClienteDetalhesLabel').innerHTML = `<i class="bi bi-person-fill"></i> Detalhes do Cliente: ${nome}`;
+
+                // Lógica de Fidelidade
+                const progresso = (cortes / 10) * 100;
+
+                // Preencher o conteúdo do modal
+                // ATENÇÃO: Os IDs no modal de detalhes devem existir
+                if(document.getElementById('cortesAtuais')) {
+                    document.getElementById('cortesAtuais').textContent = `${cortes} de 10`;
+                }
+                // ... (preencher o restante dos dados do modal com o progresso) ...
+            }
+        });
+    }
+}
+
+
     initialState() {
         this.body.classList.remove('sidebar-open');
         this.menuToggle.innerHTML = '<i class="bi bi-list"></i>';
@@ -291,6 +328,7 @@ class AdminDashboard {
         this.setupServiceManagement();
         this.setupNavigationListeners();
         this.initialState();
+        this.setupModalDetalhesLoader()
     }
 }
 
