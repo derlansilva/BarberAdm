@@ -1,11 +1,10 @@
 package com.example.evoluxo.controller;
 
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-@Controller
-public class controller {
+@org.springframework.stereotype.Controller
+public class Controller {
 
     @GetMapping("admin")
     public String admin(){

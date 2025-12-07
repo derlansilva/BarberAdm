@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -326,7 +326,127 @@ body.sidebar-open #main-header {
         </div>
     </div>
 
-    <div id="servicos-section" class="content-section"></div>
+    <div id="servicos-section" class="content-section">
+
+        <div class="d-flex justify-content-end mb-4">
+            <button class="btn btn-success shadow-sm" data-bs-toggle="modal" data-bs-target="#modalAdicionarServico">
+                <i class="bi bi-plus-circle"></i> Adicionar Novo Serviço
+            </button>
+        </div>
+
+        <div class="card shadow-lg">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="bi bi-tags-fill"></i> Serviços Ativos</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Nome do Serviço</th>
+                            <th>Preço</th>
+                            <th>Duração Estimada</th>
+                            <th>Ações</th>
+                        </tr>
+                        </thead>
+                        <tbody id="listaServicosTabela">
+                        <tr data-id="1">
+                            <td>Corte de Cabelo</td>
+                            <td>R$ 40,00</td>
+                            <td>40 min</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info me-2 btn-editar-servico" data-bs-toggle="modal" data-bs-target="#modalEditarServico"><i class="bi bi-pencil-square"></i> Editar</button>
+                                <button class="btn btn-sm btn-outline-danger btn-remover-servico"><i class="bi bi-trash"></i> Remover</button>
+                            </td>
+                        </tr>
+                        <tr data-id="2">
+                            <td>Barba Tradicional</td>
+                            <td>R$ 35,00</td>
+                            <td>30 min</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info me-2 btn-editar-servico" data-bs-toggle="modal" data-bs-target="#modalEditarServico"><i class="bi bi-pencil-square"></i> Editar</button>
+                                <button class="btn btn-sm btn-outline-danger btn-remover-servico"><i class="bi bi-trash"></i> Remover</button>
+                            </td>
+                        </tr>
+                        <tr data-id="3">
+                            <td>Combo (Corte + Barba)</td>
+                            <td>R$ 70,00</td>
+                            <td>75 min</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info me-2 btn-editar-servico" data-bs-toggle="modal" data-bs-target="#modalEditarServico"><i class="bi bi-pencil-square"></i> Editar</button>
+                                <button class="btn btn-sm btn-outline-danger btn-remover-servico"><i class="bi bi-trash"></i> Remover</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalAdicionarServico" tabindex="-1" aria-labelledby="modalAdicionarServicoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="modalAdicionarServicoLabel"><i class="bi bi-plus-lg"></i> Novo Serviço</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formAdicionarServico">
+                        <div class="mb-3">
+                            <label for="nomeServico" class="form-label">Nome</label>
+                            <input type="text" class="form-control" id="nomeServico" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="precoServico" class="form-label">Preço (R$)</label>
+                                <input type="number" class="form-control" id="precoServico" step="0.01" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="duracaoServico" class="form-label">Duração (minutos)</label>
+                                <input type="number" class="form-control" id="duracaoServico" required>
+                            </div>
+                        </div>
+                        <div class="d-grid mt-3">
+                            <button type="submit" class="btn btn-success btn-lg">Salvar Serviço</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalEditarServico" tabindex="-1" aria-labelledby="modalEditarServicoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="modalEditarServicoLabel"><i class="bi bi-pencil"></i> Editar Serviço</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarServico">
+                        <input type="hidden" id="servicoIdEditar" name="id"> <div class="mb-3">
+                        <label for="nomeServicoEditar" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="nomeServicoEditar" required value="Corte de Cabelo">
+                    </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="precoServicoEditar" class="form-label">Preço (R$)</label>
+                                <input type="number" class="form-control" id="precoServicoEditar" step="0.01" required value="40.00">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="duracaoServicoEditar" class="form-label">Duração (minutos)</label>
+                                <input type="number" class="form-control" id="duracaoServicoEditar" required value="40">
+                            </div>
+                        </div>
+                        <div class="d-grid mt-3">
+                            <button type="submit" class="btn btn-info text-white btn-lg">Atualizar Serviço</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="fidelidade-section" class="content-section"></div>
 
@@ -531,8 +651,12 @@ body.sidebar-open #main-header {
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
 
+<script src="/js/admin_dashboard.js"></script>
+<script th:src="@{/js/admin_dashboard.js}"></script>
+
+<script>
+/*
     document.addEventListener('DOMContentLoaded', function () {
 
     // =================================================================
@@ -786,7 +910,7 @@ function toggleSidebar() {
 
 });
 
-
+*/
 </script>
 </body>
 </html>
