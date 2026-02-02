@@ -1,9 +1,23 @@
 package org.barber.model;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
+
+@Entity
+@Table(name ="appointments")
 public class Appointment {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @ManyToOne
     private Cliente cliente;
+
+    @ManyToOne
+    private ServiceModel serviceModel;
+
     private LocalDateTime date;
 
 

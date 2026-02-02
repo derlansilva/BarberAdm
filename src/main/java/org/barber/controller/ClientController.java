@@ -1,6 +1,8 @@
 package org.barber.controller;
 
+import org.barber.model.Client;
 import org.barber.model.Cliente;
+import org.barber.repository.ClienteRepository;
 import org.barber.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,40 +17,21 @@ import java.util.List;
 
 @RestController
 public class ClientController {
-    @Autowired
-    private ClientService clientService;
+    @Autowired private ClienteRepository clienteRepository;
 
-    @PostMapping("/cadastrar")
-    public ResponseEntity<String> handleCadastroCliente(@RequestParam String nome , @RequestParam  String whatsapp  ){
-        System.out.printf("nome " + nome );
-
-        boolean sucess = clientService.saveNewCliente(nome,whatsapp);
-
-
-
-        if(sucess){
-
-            System.out.printf("Cliente cadastrado com sucesso!\n");
-            return ResponseEntity.ok("Cliente cadastrado com sucesso!");
-
+    @PostMapping("/register/client")
+    public ResponseEntity<String> handleRegisterClient(@RequestParam String name  , @RequestParam String whatsapp){
+        if(clienteRepository.findByName(name).isPresent()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cliente ja existe");
         }
-        else{
-            System.out.printf("Cliente cadastrado com erro!\n");
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Erro ao cadastrar ou cliente já existe.");
-        }
+
+        clienteRepository.save(new Client(name , whatsapp));
+
+        return ResponseEntity.ok("Cliente cadastrado com sucesso");
     }
 
-    @GetMapping("/api/find")
-    public List<Cliente> findAllClientes(@RequestParam("termo") String name){
-
-        System.out.println("verificando se esta batendo no back");
-        List<Cliente> cliente = clientService.findAllClientesByName(name);
-
-        for(Cliente c : cliente){
-            System.out.println(c.getNome());
-        }
-        return clientService.findAllClientesByName(name);
+    @GetMapping
+    public List<Client> findAllClient(@RequestParam("termo") String name){
+        return clienteRepository.findByNomeContainingIgnoreCase(name);
     }
 }
