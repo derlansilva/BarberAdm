@@ -1,9 +1,7 @@
 package org.barber.controller;
 
 import org.barber.model.Client;
-import org.barber.model.Cliente;
 import org.barber.repository.ClienteRepository;
-import org.barber.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,17 +19,26 @@ public class ClientController {
 
     @PostMapping("/register/client")
     public ResponseEntity<String> handleRegisterClient(@RequestParam String name  , @RequestParam String whatsapp){
-        if(clienteRepository.findByName(name).isPresent()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cliente ja existe");
+
+        try {
+
+            if(clienteRepository.findByName(name).isPresent()){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cliente ja existe");
+            }
+
+            Client client = new Client(name , whatsapp);
+
+            clienteRepository.save(client);
+
+            return ResponseEntity.ok("Client registered successfully!");
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
 
-        clienteRepository.save(new Client(name , whatsapp));
-
-        return ResponseEntity.ok("Cliente cadastrado com sucesso");
     }
 
-    @GetMapping
+    @GetMapping("/api/find")
     public List<Client> findAllClient(@RequestParam("termo") String name){
-        return clienteRepository.findByNomeContainingIgnoreCase(name);
+        return clienteRepository.findByNameContainingIgnoreCase(name);
     }
 }

@@ -1,6 +1,8 @@
 package org.barber.controller;
 
 import org.barber.model.Service;
+import org.barber.model.ServiceModel;
+import org.barber.repository.ServiceRepository;
 import org.barber.service.ServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,36 +16,24 @@ import java.util.List;
 @RestController
 public class ServiceController {
 
-    @Autowired
-    ServiceService serviceService;
+    @Autowired private ServiceRepository serviceRepository;
 
-    @PostMapping("/service")
-    public ResponseEntity<String> save(@RequestParam String name , @RequestParam String price , @RequestParam String time) {
-
-        Double priceDouble = Double.parseDouble(price);
-        System.out.println("testando se esta batendo no service save");
-        System.out.printf("Recebido: %s\n", name);
-        Service service = new Service(name, priceDouble, time);
+    @PostMapping("/register/service")
+    public ResponseEntity<String> createService(@RequestParam String name , @RequestParam String price , @RequestParam String time) {
 
 
-        boolean result = serviceService.saveNewService(service);
-
-        if (result) {
-            System.out.printf("sucesso: %s\n", service);
-            // Retorna o objeto Service salvo com status 200 OK
-            return ResponseEntity.ok("salvo com sucesso");
-        } else {
-            // Retorna status 500 Internal Server Error ou 400 Bad Request
-            System.out.printf("erro: Falha ao salvar %s\n", service);
-            return ResponseEntity.internalServerError().build();
+        if(serviceRepository.existsByName(name)){
+            return ResponseEntity.badRequest().body("Serviçõ já cadastrada");
         }
+
+        serviceRepository.save(new ServiceModel( name , Double.parseDouble(price) , time));
+
+        return ResponseEntity.ok("Serviço salvo com sucesso");
     }
 
 
-    @GetMapping("/api/services")
-    public ResponseEntity<List<Service>> findAll() {
-        List<Service> services = serviceService.getAllServices();
-
-        return ResponseEntity.ok(services);
+    @GetMapping("/findAll/services")
+    public List<ServiceModel> findAll() {
+        return serviceRepository.findAll();
     }
 }

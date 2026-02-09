@@ -13,5 +13,5 @@ import java.util.Locale;
 
 @Repository
 public interface ServiceRepository extends JpaRepository<ServiceModel , Long> {
-   boolean existsByTitle(String title);
+   boolean existsByName(String name);
 }

@@ -1,6 +1,7 @@
 package org.barber.model;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
@@ -9,6 +10,8 @@ public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id ;
+
+    @JsonProperty("name")
     private String name ;
     private String whatsapp;
 
